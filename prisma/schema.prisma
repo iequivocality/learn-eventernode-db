@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id                  Int                  @id @default(autoincrement())
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  role                Role                 @default(USER)
+  name                String               @unique
+  email               String               @unique
+  createdEvents       Event[]
+  createdVenues       Venue[]
+  favoritedPerformers FavoritedPerformer[]
+}
+
+model Event {
+  id           Int               @id @default(autoincrement())
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  published    Boolean           @default(false)
+  title        String            @db.VarChar(255)
+  dateAndTime  DateTime          @default(now())
+  timeDetail   String            @db.VarChar(255)
+  relatedLinks String            @db.VarChar(255)
+  description  String            @db.LongText
+  creatorId    Int
+  venueId      Int
+  performers   EventAppearance[]
+  creator      User              @relation(fields: [creatorId], references: [id])
+  venue        Venue             @relation(fields: [venueId], references: [id])
+
+  @@index([creatorId])
+  @@index([venueId])
+}
+
+model EventAppearance {
+  eventPerformerId Int
+  eventId          Int
+  eventPerformer   Performer @relation(fields: [eventPerformerId], references: [id])
+  event            Event     @relation(fields: [eventId], references: [id])
+
+  @@id([eventPerformerId, eventId])
+  @@index([eventPerformerId])
+  @@index([eventId])
+}
+
+model Performer {
+  id             Int                  @id @default(autoincrement())
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  name           String               @unique
+  fans           FavoritedPerformer[]
+  eventsAppeared EventAppearance[]
+}
+
+model FavoritedPerformer {
+  fanId       Int       @id
+  performerId Int
+  favoritedAt DateTime  @default(now())
+  fan         User      @relation(fields: [fanId], references: [id])
+  performer   Performer @relation(fields: [performerId], references: [id])
+
+  @@index([fanId])
+  @@index([performerId])
+}
+
+model Venue {
+  id                 Int      @id @default(autoincrement())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  published          Boolean  @default(false)
+  title              String   @db.VarChar(255)
+  locationTitle      String   @db.VarChar(255)
+  locationLink       String   @db.LongText
+  telephoneNumber    String   @db.VarChar(50)
+  seatingCapacity    String   @db.VarChar(255)
+  seatingInformation String   @db.VarChar(255)
+  description        String   @db.LongText
+  creatorId          Int
+  events             Event[]
+  creator            User     @relation(fields: [creatorId], references: [id])
+
+  @@index([creatorId])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
