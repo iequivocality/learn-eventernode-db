@@ -18,24 +18,24 @@ model User {
   createdEvents       Event[]
   createdVenues       Venue[]
   favoritedPerformers FavoritedPerformer[]
-  attendedEvents EventerAttendance[]
+  attendedEvents      EventerAttendance[]
 }
 
 model Event {
-  id           Int               @id @default(autoincrement())
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  published    Boolean           @default(false)
-  title        String            @db.VarChar(255)
-  dateAndTime  DateTime          @default(now())
-  timeDetail   String            @db.VarChar(255)
-  relatedLinks String            @db.VarChar(255)
-  description  String            @db.LongText
+  id           Int                        @id @default(autoincrement())
+  createdAt    DateTime                   @default(now())
+  updatedAt    DateTime                   @updatedAt
+  published    Boolean                    @default(false)
+  title        String                     @db.VarChar(255)
+  dateAndTime  DateTime                   @default(now())
+  timeDetail   String                     @db.VarChar(255)
+  relatedLinks String                     @db.VarChar(255)
+  description  String                     @db.LongText
   creatorId    Int
   venueId      Int
   performers   PerformerEventAppearance[]
-  creator      User              @relation(fields: [creatorId], references: [id])
-  venue        Venue             @relation(fields: [venueId], references: [id])
+  creator      User                       @relation(fields: [creatorId], references: [id])
+  venue        Venue                      @relation(fields: [venueId], references: [id])
   attendees    EventerAttendance[]
 
   @@index([creatorId])
@@ -43,12 +43,12 @@ model Event {
 }
 
 model EventerAttendance {
-  eventer User @relation(fields: [eventerId], references: [id])
-  eventerId Int
-  attendedEvent Event @relation(fields: [attendedEventId], references: [id])
-  attendedEventId Int
+  eventer           User   @relation(fields: [eventerId], references: [id])
+  eventerId         Int
+  attendedEvent     Event  @relation(fields: [attendedEventId], references: [id])
+  attendedEventId   Int
   attendanceDetails String @db.VarChar(255)
-  totalCost Int @default(0)
+  totalCost         Int    @default(0)
 
   @@id([eventerId, attendedEventId])
   @@index([eventerId])
@@ -67,10 +67,10 @@ model PerformerEventAppearance {
 }
 
 model Performer {
-  id             Int                  @id @default(autoincrement())
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
-  name           String               @unique
+  id             Int                        @id @default(autoincrement())
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+  name           String                     @unique
   fans           FavoritedPerformer[]
   eventsAppeared PerformerEventAppearance[]
 }
