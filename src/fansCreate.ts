@@ -36,4 +36,9 @@ const main = async () => {
   console.log('fansOfPerformers', fansOfPerformers)
 };
 
-void main();
+main().then(async () => {
+  await prisma.$disconnect();
+}).catch(async (err) => {
+  console.error(err);
+  await prisma.$disconnect();
+});

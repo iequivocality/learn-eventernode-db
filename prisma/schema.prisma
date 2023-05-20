@@ -18,6 +18,7 @@ model User {
   createdEvents       Event[]
   createdVenues       Venue[]
   favoritedPerformers FavoritedPerformer[]
+  attendedEvents EventerAttendance[]
 }
 
 model Event {
@@ -32,15 +33,29 @@ model Event {
   description  String            @db.LongText
   creatorId    Int
   venueId      Int
-  performers   EventAppearance[]
+  performers   PerformerEventAppearance[]
   creator      User              @relation(fields: [creatorId], references: [id])
   venue        Venue             @relation(fields: [venueId], references: [id])
+  attendees    EventerAttendance[]
 
   @@index([creatorId])
   @@index([venueId])
 }
 
-model EventAppearance {
+model EventerAttendance {
+  eventer User @relation(fields: [eventerId], references: [id])
+  eventerId Int
+  attendedEvent Event @relation(fields: [attendedEventId], references: [id])
+  attendedEventId Int
+  attendanceDetails String @db.VarChar(255)
+  totalCost Int @default(0)
+
+  @@id([eventerId, attendedEventId])
+  @@index([eventerId])
+  @@index([attendedEventId])
+}
+
+model PerformerEventAppearance {
   eventPerformerId Int
   eventId          Int
   eventPerformer   Performer @relation(fields: [eventPerformerId], references: [id])
@@ -57,7 +72,7 @@ model Performer {
   updatedAt      DateTime             @updatedAt
   name           String               @unique
   fans           FavoritedPerformer[]
-  eventsAppeared EventAppearance[]
+  eventsAppeared PerformerEventAppearance[]
 }
 
 model FavoritedPerformer {
